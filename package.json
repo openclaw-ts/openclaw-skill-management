@@ -28,6 +28,7 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
     "openclaw": "^2026.3.28"
   }
 }

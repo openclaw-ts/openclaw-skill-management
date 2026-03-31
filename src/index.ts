@@ -89,6 +89,13 @@ export default definePluginEntry({
             return true;
           }
 
+          if (req.method === 'POST' && pathParts.length === 2 && pathParts[1] === 'upsert') {
+            const body = await parseJsonBody(req);
+            const result = skillService.upsertSkill(body.name, body.content);
+            respondJson(res, 200, result);
+            return true;
+          }
+
           return false;
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Unknown error';

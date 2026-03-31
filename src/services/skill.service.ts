@@ -190,6 +190,31 @@ export class SkillService {
     fs.rmSync(skillDir, { recursive: true, force: true });
   }
 
+  upsertSkill(name: string, content: string): SkillInfo {
+    const skillsDir = this.getSkillsDir();
+    const skillDir = path.join(skillsDir, name);
+    const skillFile = path.join(skillDir, 'SKILL.md');
+
+    const isExisting = fs.existsSync(skillFile);
+
+    if (!fs.existsSync(skillsDir)) {
+      fs.mkdirSync(skillsDir, { recursive: true });
+    }
+    if (!fs.existsSync(skillDir)) {
+      fs.mkdirSync(skillDir, { recursive: true });
+    }
+    fs.writeFileSync(skillFile, content, 'utf-8');
+
+    const stats = fs.statSync(skillFile);
+    return {
+      name,
+      description: this.extractDescription(content),
+      content,
+      createdAt: isExisting ? stats.birthtime : stats.mtime,
+      updatedAt: stats.mtime,
+    };
+  }
+
   private extractDescription(content: string): string {
     const match = content.match(/description:\s*(.+)/);
     if (match) {

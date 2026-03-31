@@ -20,6 +20,7 @@ openclaw plugins install /path/to/openclaw-skill-management
 | `PUT` | `/skill/:name` | 更新指定技能 |
 | `DELETE` | `/skill/:name` | 删除指定技能 |
 | `POST` | `/skill/sync` | 从远程同步技能 |
+| `POST` | `/skill/upsert` | 插入或更新技能（存在则更新，不存在则创建） |
 
 ---
 
@@ -185,6 +186,51 @@ Content-Type: application/json
 
 ---
 
+### 7. 插入或更新技能（Upsert）
+
+```bash
+POST /skill/upsert
+Content-Type: application/json
+
+{
+  "name": "my-skill",
+  "content": "# My Skill\n\n这是技能内容"
+}
+```
+
+**请求参数：**
+
+| 参数 | 类型 | 必填 | 描述 |
+|------|------|------|------|
+| `name` | string | 是 | 技能名称 |
+| `content` | string | 是 | 技能内容（SKILL.md 格式） |
+
+**响应示例（技能不存在，创建新技能）：**
+
+```json
+{
+  "name": "my-skill",
+  "description": "这是技能内容",
+  "content": "# My Skill\n\n这是技能内容",
+  "createdAt": "2026-03-30T10:00:00.000Z",
+  "updatedAt": "2026-03-30T10:00:00.000Z"
+}
+```
+
+**响应示例（技能已存在，更新技能）：**
+
+```json
+{
+  "name": "my-skill",
+  "description": "更新后的技能内容",
+  "content": "# My Skill\n\n更新后的技能内容",
+  "createdAt": "2026-03-30T10:00:00.000Z",
+  "updatedAt": "2026-03-30T12:00:00.000Z"
+}
+```
+
+---
+
 ## 技能存储位置
 
 默认技能存储在：`~/.agents/skills`
@@ -229,6 +275,11 @@ curl -X DELETE http://localhost:18789/skill/hello-world
 curl -X POST http://localhost:18789/skill/sync \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/skills.json", "outdir": "~/.agents/skills"}'
+
+# 插入或更新技能（Upsert）
+curl -X POST http://localhost:18789/skill/upsert \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-skill", "content": "# My Skill\n\n技能内容"}'
 ```
 
 ---
